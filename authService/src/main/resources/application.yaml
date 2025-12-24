@@ -27,5 +27,10 @@ external:
     secretKey: c2d1a2cf01f398933aaacb52472185057d9c2ab8b6e17738cb810bbc8155e881
     expiration: 900000
     refresh-expiration: 1
-
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
 
