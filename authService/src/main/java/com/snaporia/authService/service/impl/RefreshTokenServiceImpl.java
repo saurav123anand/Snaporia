@@ -69,11 +69,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         if (keys == null) return;
 
         for (String key : keys) {
+            Object value = redisTemplate.opsForValue().get(key);
+            if (value == null) {
+                continue;
+            }
             RefreshTokenSession session =
-                    (RefreshTokenSession) redisTemplate.opsForValue().get(key);
+                    objectMapper.convertValue(value, RefreshTokenSession.class);
 
-            if (session != null &&
-                    userEmail.equals(session.getUserEmail())) {
+            if (userEmail.equals(session.getUserEmail())) {
                 redisTemplate.delete(key);
             }
         }

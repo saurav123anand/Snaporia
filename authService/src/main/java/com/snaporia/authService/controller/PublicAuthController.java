@@ -8,13 +8,14 @@ import com.snaporia.authService.exception.TokenExpiredException;
 import com.snaporia.authService.service.RefreshTokenService;
 import com.snaporia.authService.service.UserService;
 import com.snaporia.authService.service.impl.CustomUserDetailsServiceImpl;
-import com.snaporia.authService.util.JwtUtil;
+import com.snaporia.common_security.util.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ import java.util.Set;
 @Validated
 public class PublicAuthController {
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsServiceImpl userDetailsService;
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
@@ -57,7 +58,8 @@ public class PublicAuthController {
         String device = "UNKNOWN";
 
         return new AuthResponse(
-                jwtUtil.generateToken(user),
+                jwtTokenProvider.generateToken(user.getUsername(),
+                        user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()),
                 refreshTokenService.create(user.getUsername(),device,
                         ip,
                         userAgent),
@@ -77,7 +79,8 @@ public class PublicAuthController {
         User user =
                 (User)userDetailsService.loadUserByUsername(session.getUserEmail());
 
-        String newAccessToken = jwtUtil.generateToken(user);
+        String newAccessToken = jwtTokenProvider.generateToken(user.getUsername(),
+                user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
 
         String newRefreshToken =
                 refreshTokenService.create(

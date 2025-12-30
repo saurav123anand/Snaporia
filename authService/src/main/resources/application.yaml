@@ -22,11 +22,10 @@ spring:
       port: 6379
       password:  # Leave empty if no password
       timeout: 60000
-external:
-  jwt:
-    secretKey: c2d1a2cf01f398933aaacb52472185057d9c2ab8b6e17738cb810bbc8155e881
-    expiration: 900000
-    refresh-expiration: 1
+jwt:
+  secretKey: c2d1a2cf01f398933aaacb52472185057d9c2ab8b6e17738cb810bbc8155e881
+  expiration: 900000
+  refreshExpiration: 604800000
 eureka:
   client:
     service-url:
